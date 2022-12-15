@@ -1,0 +1,45 @@
+x-shared-enviroment-between-producer-and-consumer: &common-environment-producer-consumer
+  BROKER_HOST: broker
+  BROKER_PORT: "${BROKER_PORT}"
+  TOPIC_ID: "${TOPIC_ID}"
+  TOPIC_PARTITION_ID: "${TOPIC_PARTITION_ID}"
+
+services:
+  coordinator:
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "${ZOOKEEPER_PORT}"
+      ZOOKEEPER_TICK_TIME: 2000
+    image: confluentinc/cp-zookeeper:7.3.0
+
+  broker:
+    depends_on:
+    - coordinator
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:${ZOOKEEPER_PORT}"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_BROKER_ID: "${TOPIC_PARTITION_ID}"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: "coordinator:${ZOOKEEPER_PORT}"
+    image: confluentinc/cp-kafka:7.3.0
+    ports:
+    - "${BROKER_PORT}:9092"
+
+  producer:
+    build:
+      context: ./producer
+    depends_on:
+    - broker
+    environment:
+      << : *common-environment-producer-consumer
+
+  consumer:
+    build:
+      context: ./consumer
+    depends_on:
+    - broker
+    environment:
+      << : *common-environment-producer-consumer
