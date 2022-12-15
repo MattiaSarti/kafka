@@ -45,4 +45,4 @@ services:
     environment:
       << : *common-environment-producer-consumer
       CONSUMER_GROUP_ID: "stock-prices-chart-service"
-    # network_mode: host
+    network_mode: host
