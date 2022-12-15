@@ -3,10 +3,11 @@ Periodic (random) stock price update events publication.
 """
 
 
+from logging import INFO, getLogger, info
 from os import environ
 from time import sleep
 
-from confluent_kafka import Producer
+from confluent_kafka import Message, Producer
 
 
 BROKER_HOST = environ['BROKER_HOST']
@@ -15,6 +16,19 @@ TOPIC_ID = environ['TOPIC_ID']
 TOPIC_PARTITION_ID = int(environ['TOPIC_PARTITION_ID'])
 
 EVENT_PUBLISHING_TIMEOUT_IN_S = 120
+INFORMATIVE_MESSAGE_METHODS = [
+    'headers',
+    'key',
+    'latency',
+    'offset',
+    'partition',
+    'timestamp',
+    'topic',
+    'value'
+]
+
+
+getLogger().setLevel(INFO)
 
 
 def event_publication_acknowledgment(err, msg) -> None:
@@ -22,9 +36,15 @@ def event_publication_acknowledgment(err, msg) -> None:
     Print either the successfully published event ot the event failed to be
     delivered together with its error.
     """
-    print(
-        f"Event failed to be delivered: {str(msg)}\n\tError: {str(err)}"
-        if err is not None else f"Event published: {str(msg)}"
+    info(
+        (
+            "Event failed to be delivered!" +
+            f"\n\tEvent details: {stringify_message(msg)}" +
+            f"\n\tError: {str(err)}"
+        ) if err is not None else (
+            "Event published ✓" +
+            f"\n\tEvent details: {stringify_message(msg)}"
+        )
     )
 
 
@@ -47,6 +67,20 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
             value='is amazing'  # TODO
         )
         events_producer.flush(timeout=EVENT_PUBLISHING_TIMEOUT_IN_S)
+
+
+def stringify_message(message: Message) -> str:
+    """
+    Turn the given client message into a well-formatted and informative
+    string.
+    """
+    message_as_string = []
+    for method_name in INFORMATIVE_MESSAGE_METHODS:
+        method = getattr(message, method_name)
+        message_as_string.append(
+            method_name + ': ' + str(method())
+        )
+    return ' | '.join(message_as_string)
 
 
 if __name__ == '__main__':
