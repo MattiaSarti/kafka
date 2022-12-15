@@ -12,8 +12,8 @@ from confluent_kafka import Message, Producer
 
 BROKER_HOST = environ['BROKER_HOST']
 BROKER_PORT = environ['BROKER_PORT']
+EVENTS_KEY = environ['EVENTS_KEY']
 TOPIC_ID = environ['TOPIC_ID']
-TOPIC_PARTITION_ID = int(environ['TOPIC_PARTITION_ID'])
 
 EVENT_PUBLISHING_TIMEOUT_IN_S = 120
 INFORMATIVE_MESSAGE_METHODS = [
@@ -62,8 +62,8 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
         events_producer.produce(
             on_delivery=event_publication_acknowledgment,
             topic=TOPIC_ID,
-            partition=TOPIC_PARTITION_ID,
-            key='mattia',  # TODO
+            partition=None,  # anyway, events with same key -> same partition
+            key=EVENTS_KEY,
             value='is amazing'  # TODO
         )
         events_producer.flush(timeout=EVENT_PUBLISHING_TIMEOUT_IN_S)

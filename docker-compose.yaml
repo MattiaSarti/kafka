@@ -1,8 +1,8 @@
 x-shared-enviroment-between-producer-and-consumer: &common-environment-producer-consumer
   BROKER_HOST: broker
   BROKER_PORT: "${BROKER_PORT}"
+  EVENTS_KEY: "${EVENTS_KEY}"
   TOPIC_ID: "${TOPIC_ID}"
-  TOPIC_PARTITION_ID: "${TOPIC_PARTITION_ID}"
 
 services:
   coordinator:
@@ -19,7 +19,7 @@ services:
     environment:
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_ID: 0
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -44,4 +44,5 @@ services:
     - broker
     environment:
       << : *common-environment-producer-consumer
+      CONSUMER_GROUP_ID: "stock-prices-chart-service"
     # network_mode: host

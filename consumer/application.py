@@ -6,14 +6,17 @@ https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/i
 """
 
 
+from os import environ
+
+from confluent_kafka import Consumer
 from dash import Dash, Input, Output
 from dash.dcc import Graph
 from dash.html import Button, Div, H1
 from plotly.express import line
 
 
-REFRESH_BUTTON_COMPONENT_ID = 'refresh-button'
-STOCK_CHART_COMPONENT_ID = 'stock-price-chart'
+CONSUMER_GROUP_ID = environ['CONSUMER_GROUP_ID']
+EVENTS_KEY = environ['EVENTS_KEY']
 
 GRID_STYLE = {
     'gridcolor': '#d3d3d3',
@@ -22,6 +25,8 @@ GRID_STYLE = {
     'showgrid': True
 }
 MAIN_COLOR = '#33ceff'
+REFRESH_BUTTON_COMPONENT_ID = 'refresh-button'
+STOCK_CHART_COMPONENT_ID = 'stock-price-chart'
 TEXT_STYLE = {
     'font-family': 'Times New Roman',
     'font-style': 'italic',
