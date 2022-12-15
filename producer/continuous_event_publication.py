@@ -62,7 +62,11 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
         events_producer.produce(
             on_delivery=event_publication_acknowledgment,
             topic=TOPIC_ID,
-            partition=None,  # anyway, events with same key -> same partition
+            # partition=...,
+            # NOTE: no need to specify a unique partition as, anyway, events
+            # with same key are guaranteed to be assigned to the same
+            # partition; thus, any partition is fine as long as the key is
+            # kept constant
             key=EVENTS_KEY,
             value='is amazing'  # TODO
         )
