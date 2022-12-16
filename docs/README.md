@@ -10,3 +10,7 @@ kafka-topics --bootstrap-server broker:${BROKER_PORT} --topic ${TOPIC_ID} --crea
 echo "Topic '${TOPIC_ID}' created:"
 kafka-topics --bootstrap-server broker:${BROKER_PORT} --topic ${TOPIC_ID} --describe
 ```
+
+Simplifications:
+- no fault tolerance (single broker, producer and consumer instances, simplified producer and consumer)
+- consumer cannot scale (no coordination in distributed application), Kafka Streams API not employed
