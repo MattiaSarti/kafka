@@ -187,4 +187,4 @@ def update_and_display_stock_price_chart(*args, **kwargs):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=CONSUMER_APPLICATION_PORT)
+    app.run(host='0.0.0.0', port=CONSUMER_APPLICATION_PORT, debug=False)
