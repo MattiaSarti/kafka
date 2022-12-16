@@ -46,7 +46,7 @@ GRID_STYLE = {
     'showgrid': True
 }
 MAIN_COLOR = '#33ceff'
-N_LATEST_PRICES_MAKING_CHART_HISTORY = 6
+N_LATEST_PRICES_MAKING_CHART_HISTORY = 60
 REFRESH_BUTTON_COMPONENT_ID = 'refresh-button'
 STOCK_CHART_COMPONENT_ID = 'stock-price-chart'
 TEXT_STYLE = {
@@ -91,7 +91,6 @@ def continuous_polling_over_any_latest_events():
     Continuously updating the price chart data with any latest events via
     polling.
     """
-    from time import sleep; sleep(60)
     global latest_prices, latest_timesteps
 
     events_consumer = Consumer(
