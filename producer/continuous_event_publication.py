@@ -27,7 +27,7 @@ INFORMATIVE_MESSAGE_METHODS = [
     'topic',
     'value'
 ]
-INTERVAL_FOR_PRICE_CHANGE_PRODUCTION_IN_S = 6
+INTERVAL_FOR_PRICE_CHANGE_PRODUCTION_IN_S = 0.6
 
 
 def event_publication_acknowledgment(
