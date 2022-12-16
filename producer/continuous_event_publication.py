@@ -27,7 +27,6 @@ INFORMATIVE_MESSAGE_METHODS = [
     'topic',
     'value'
 ]
-MESSAGE_VALUE_FIELDS_SEPARATOR = '|'
 
 
 def event_publication_acknowledgment(
@@ -65,8 +64,7 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
         }
     )
 
-    timestamp = 0
-    price = 1
+    current_price = 1
 
     while True:
         sleep(10)
@@ -80,12 +78,11 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
             # partition; thus, any partition is fine as long as the key is
             # kept constant
             key=EVENTS_KEY,
-            value=str(timestamp) + MESSAGE_VALUE_FIELDS_SEPARATOR + str(price)
+            value=str(current_price)
         )
         events_producer.flush(timeout=EVENT_PUBLISHING_TIMEOUT_IN_S)
 
-        timestamp += 1
-        price += uniform(a=-0.9, b=1.6)
+        current_price += uniform(a=-0.9, b=1.6)
 
 
 def stringify_message(message: Message) -> str:
