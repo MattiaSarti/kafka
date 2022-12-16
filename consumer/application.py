@@ -43,6 +43,7 @@ GRID_STYLE = {
     'showgrid': True
 }
 MAIN_COLOR = '#33ceff'
+MESSAGE_VALUE_FIELDS_SEPARATOR = '|'
 N_LATEST_PRICES_MAKING_CHART_HISTORY = 6
 REFRESH_BUTTON_COMPONENT_ID = 'refresh-button'
 STOCK_CHART_COMPONENT_ID = 'stock-price-chart'
@@ -162,7 +163,10 @@ def update_and_display_stock_price_chart(*args, **kwargs):
                 else:
                     raise KafkaException(error)
 
-            timestamp, price = map(float, message.value().split('|'))
+            timestamp, price = map(
+                float,
+                message.value().split(MESSAGE_VALUE_FIELDS_SEPARATOR)
+            )
             latest_prices.append(price)
             latest_timestamps.append(timestamp)
 
