@@ -26,6 +26,7 @@ from plotly.express import line
 
 BROKER_HOST = environ['BROKER_HOST']
 BROKER_PORT = environ['BROKER_PORT']
+CONSUMER_APPLICATION_PORT = environ['CONSUMER_APPLICATION_PORT']
 CONSUMER_GROUP_ID = environ['CONSUMER_GROUP_ID']
 EVENTS_KEY = environ['EVENTS_KEY']
 TOPIC_ID = environ['TOPIC_ID']
@@ -145,6 +146,8 @@ def update_and_display_stock_price_chart(*args, **kwargs):
     """
     global events_consumer, latest_prices, latest_timestamps
 
+    # updating the price chart data with any latest events:
+
     try:
         events_consumer.subscribe(topics=[TOPIC_ID])
 
@@ -171,6 +174,8 @@ def update_and_display_stock_price_chart(*args, **kwargs):
         events_consumer.close()
         raise exception
 
+    # recreating the price chart with up-to-date data:
+
     figure = line(x=latest_timestamps, y=latest_prices)
 
     figure.update_layout(**FIGURE_LAYOUT)
@@ -182,4 +187,4 @@ def update_and_display_stock_price_chart(*args, **kwargs):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=CONSUMER_APPLICATION_PORT)

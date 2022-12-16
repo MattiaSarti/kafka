@@ -17,7 +17,7 @@ services:
     depends_on:
     - coordinator
     environment:
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://broker:${BROKER_PORT},PLAINTEXT_INTERNAL://broker:29092"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_BROKER_ID: 0
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -26,8 +26,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_ZOOKEEPER_CONNECT: "coordinator:${ZOOKEEPER_PORT}"
     image: confluentinc/cp-kafka:7.3.0
-    ports:
-    - "${BROKER_PORT}:9092"
 
   producer:
     build:
@@ -44,5 +42,7 @@ services:
     - broker
     environment:
       << : *common-environment-producer-consumer
+      CONSUMER_APPLICATION_PORT:
       CONSUMER_GROUP_ID: "stock-prices-chart-service"
-    network_mode: host
+    ports:
+    - "${CONSUMER_APPLICATION_PORT}:${CONSUMER_APPLICATION_PORT}"
