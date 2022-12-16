@@ -36,7 +36,7 @@ TOPIC_ID = environ['TOPIC_ID']
 FIGURE_LAYOUT = {
     'paper_bgcolor': 'rgba(0, 0, 0, 0)',
     'plot_bgcolor': 'rgba(0, 0, 0, 0)',
-    'xaxis_title': "Time",
+    'xaxis_title': "Timestep",
     'yaxis_title': "Stock Price"
 }
 GRID_STYLE = {
@@ -92,7 +92,7 @@ def continuous_polling_over_any_latest_events():
     polling.
     """
     from time import sleep; sleep(60)
-    global latest_prices, latest_timestamps
+    global latest_prices, latest_timesteps
 
     events_consumer = Consumer(
         {
@@ -121,7 +121,7 @@ def continuous_polling_over_any_latest_events():
                     raise KafkaException(error)
 
             latest_prices.append(float(message.value()))
-            latest_timestamps.append(float(message.offset()))
+            latest_timesteps.append(float(message.offset()))
 
             events_consumer.commit(asynchronous=True)
 
@@ -182,10 +182,10 @@ def update_and_display_stock_price_chart(*args, **kwargs):
     """
     Update the stock price chart figure with the latest events' data, if any.
     """
-    global latest_prices, latest_timestamps
+    global latest_prices, latest_timesteps
 
     # recreating the price chart with up-to-date data:
-    figure = line(x=latest_timestamps, y=latest_prices)
+    figure = line(x=latest_timesteps, y=latest_prices)
 
     # styling the chart:
     figure.update_layout(**FIGURE_LAYOUT)
@@ -198,7 +198,7 @@ def update_and_display_stock_price_chart(*args, **kwargs):
 
 if __name__ == '__main__':
     latest_prices = deque([], maxlen=N_LATEST_PRICES_MAKING_CHART_HISTORY)
-    latest_timestamps = deque([], maxlen=N_LATEST_PRICES_MAKING_CHART_HISTORY)
+    latest_timesteps = deque([], maxlen=N_LATEST_PRICES_MAKING_CHART_HISTORY)
 
     Thread(target=continuous_polling_over_any_latest_events).start()
 
