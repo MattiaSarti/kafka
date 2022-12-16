@@ -5,6 +5,7 @@ Periodic (random) stock price update events publication.
 
 from logging import INFO, getLogger, info
 from os import environ
+from random import uniform
 from time import sleep
 
 from confluent_kafka import KafkaError, Message, Producer
@@ -59,12 +60,13 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
     events_producer = Producer(
         {
             'bootstrap.servers': f"{BROKER_HOST}:{BROKER_PORT}",
-            'enable.idempotence': True,
-            'transactional.id': 0
+            # 'enable.idempotence': True,  # TODO
+            # 'transactional.id': 0  # TODO
         }
     )
 
-    timestamp, price = 1
+    timestamp = 0
+    price = 1
 
     while True:
         sleep(10)
@@ -83,7 +85,7 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
         events_producer.flush(timeout=EVENT_PUBLISHING_TIMEOUT_IN_S)
 
         timestamp += 1
-        price += 1
+        price += uniform(a=-0.9, b=1.6)
 
 
 def stringify_message(message: Message) -> str:
