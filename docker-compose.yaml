@@ -27,11 +27,18 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: "coordinator:${ZOOKEEPER_PORT}"
     image: confluentinc/cp-kafka:7.3.0
 
+  init-broker:
+    command: "sleep 30"
+    depends_on:
+    - broker
+    image: python:3.10.9
+
   producer:
     build:
       context: ./producer
     depends_on:
-    - broker
+      init-broker:
+        condition: service_completed_successfully
     environment:
       << : *common-environment-producer-consumer
 
@@ -39,7 +46,8 @@ services:
     build:
       context: ./consumer
     depends_on:
-    - broker
+      init-broker:
+        condition: service_completed_successfully
     environment:
       << : *common-environment-producer-consumer
       CONSUMER_APPLICATION_PORT:
