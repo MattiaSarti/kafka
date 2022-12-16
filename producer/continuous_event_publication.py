@@ -7,7 +7,7 @@ from logging import INFO, getLogger, info
 from os import environ
 from time import sleep
 
-from confluent_kafka import Message, Producer
+from confluent_kafka import KafkaError, Message, Producer
 
 
 BROKER_HOST = environ['BROKER_HOST']
@@ -26,24 +26,27 @@ INFORMATIVE_MESSAGE_METHODS = [
     'topic',
     'value'
 ]
+MESSAGE_VALUE_FIELDS_SEPARATOR = '|'
 
 
-getLogger().setLevel(INFO)
-
-
-def event_publication_acknowledgment(err, msg) -> None:
+def event_publication_acknowledgment(
+        error: KafkaError,
+        message: Message
+) -> None:
     """
     Print either the successfully published event ot the event failed to be
     delivered together with its error.
     """
     info(
-        (
-            "Event failed to be delivered!" +
-            f"\n\tEvent details: {stringify_message(msg)}" +
-            f"\n\tError: {str(err)}"
-        ) if err is not None else (
-            "Event published ✓" +
-            f"\n\tEvent details: {stringify_message(msg)}"
+        msg=(
+            (
+                "Event failed to be delivered!"
+                f"\n\tEvent details: {stringify_message(message)}"
+                f"\n\tError: {str(error)}"
+            ) if error is not None else (
+                "Event published ✓"
+                f"\n\tEvent details: {stringify_message(message)}"
+            )
         )
     )
 
@@ -54,8 +57,15 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
     broker.
     """
     events_producer = Producer(
-        {'bootstrap.servers': f"{BROKER_HOST}:{BROKER_PORT}"}
+        {
+            'bootstrap.servers': f"{BROKER_HOST}:{BROKER_PORT}",
+            'enable.idempotence': True,
+            'transactional.id': 0
+        }
     )
+
+    timestamp, price = 1
+
     while True:
         sleep(10)
 
@@ -68,9 +78,12 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
             # partition; thus, any partition is fine as long as the key is
             # kept constant
             key=EVENTS_KEY,
-            value='is amazing'  # TODO
+            value=str(timestamp) + MESSAGE_VALUE_FIELDS_SEPARATOR + str(price)
         )
         events_producer.flush(timeout=EVENT_PUBLISHING_TIMEOUT_IN_S)
+
+        timestamp += 1
+        price += 1
 
 
 def stringify_message(message: Message) -> str:
@@ -85,6 +98,9 @@ def stringify_message(message: Message) -> str:
             method_name + ': ' + str(method())
         )
     return ' | '.join(message_as_string)
+
+
+getLogger().setLevel(INFO)
 
 
 if __name__ == '__main__':
