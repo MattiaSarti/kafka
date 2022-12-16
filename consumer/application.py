@@ -11,6 +11,7 @@ https://www.confluent.io/blog/exactly-once-semantics-are-possible-heres-how-apac
 from collections import deque
 from logging import INFO, getLogger, info
 from os import environ
+from threading import Thread
 from typing import List
 
 from confluent_kafka import (
@@ -57,7 +58,7 @@ TEXT_STYLE = {
 
 def acknowledge_commit(
         error: KafkaError,
-        partitions: List[TopicPartition]
+        topic_partitions: List[TopicPartition]
 ) -> None:
     """
     Check whether the offset was correctly committed after the message
@@ -65,34 +66,70 @@ def acknowledge_commit(
     """
     if error is not None:
         info(
-            msg=(
-                "Partition offset(s) failed to be committed!"
-                f"\n\tDetails: {str(error)}"
-            )
+            msg=f"Partition offset(s) failed to be committed: {str(error)}"
         )
     else:
         info(
             msg=(
                 "Partition offset(s) committed ✓"
-                f"\n\tDetails: {str(partitions)}"
+                "\n\tDetails:\n\t\t"
+                '\n\t\t'.join(
+                    [
+                        (
+                            f"- offset {str(topic_partition.offset)}"
+                            f" in partition {str(topic_partition.partition)}"
+                            f" of topic {str(topic_partition.offset)}"
+                        ) for topic_partition in topic_partitions
+                    ]
+                )
             )
         )
 
 
+def continuous_polling_over_any_latest_events():
+    """
+    Continuously updating the price chart data with any latest events via
+    polling.
+    """
+    from time import sleep; sleep(60)
+    global latest_prices, latest_timestamps
+
+    events_consumer = Consumer(
+        {
+            'bootstrap.servers': f"{BROKER_HOST}:{BROKER_PORT}",
+            'group.id': CONSUMER_GROUP_ID,
+            'enable.partition.eof': True,
+            'on_commit': acknowledge_commit
+        }
+    )
+
+    try:
+        events_consumer.subscribe(topics=[TOPIC_ID])
+
+        while True:
+            message = events_consumer.poll(timeout=1)  # [seconds]
+
+            if message is None:
+                continue
+
+            error = message.error()
+            if error is not None:
+                # if the end of the associated partition is reached:
+                if error.code() == KafkaError._PARTITION_EOF:
+                    continue
+                else:
+                    raise KafkaException(error)
+
+            latest_prices.append(float(message.value()))
+            latest_timestamps.append(float(message.offset()))
+
+            events_consumer.commit(asynchronous=True)
+
+    finally:
+        events_consumer.close()
+
+
 getLogger().setLevel(INFO)
-
-
-latest_prices = deque([], maxlen=N_LATEST_PRICES_MAKING_CHART_HISTORY)
-latest_timestamps = deque([], maxlen=N_LATEST_PRICES_MAKING_CHART_HISTORY)
-
-events_consumer = Consumer(
-    {
-        'bootstrap.servers': f"{BROKER_HOST}:{BROKER_PORT}",
-        'group.id': CONSUMER_GROUP_ID,
-        'enable.partition.eof': True,  # NOTE: so as not to wait for timeouts
-        'on_commit': acknowledge_commit
-    }
-)
 
 app = Dash(name=__name__)
 app.layout = Div(
@@ -145,40 +182,12 @@ def update_and_display_stock_price_chart(*args, **kwargs):
     """
     Update the stock price chart figure with the latest events' data, if any.
     """
-    global events_consumer, latest_prices, latest_timestamps
-
-    # updating the price chart data with any latest events:
-
-    try:
-        events_consumer.subscribe(topics=[TOPIC_ID])
-
-        while True:
-            message = events_consumer.poll(timeout=0.01)  # [seconds]
-
-            if message is None:
-                break
-
-            error = message.error()
-            if error is not None:
-                # if the end of the associated partition is reached:
-                if error.code() == KafkaError._PARTITION_EOF:
-                    break
-                else:
-                    raise KafkaException(error)
-
-            latest_prices.append(float(message.offset()))
-            latest_timestamps.append(float(message.value()))
-
-            events_consumer.commit(asynchronous=True)
-
-    except Exception as exception:
-        events_consumer.close()
-        raise exception
+    global latest_prices, latest_timestamps
 
     # recreating the price chart with up-to-date data:
-
     figure = line(x=latest_timestamps, y=latest_prices)
 
+    # styling the chart:
     figure.update_layout(**FIGURE_LAYOUT)
     figure.update_traces(line_color=MAIN_COLOR)
     figure.update_xaxes(**GRID_STYLE)
@@ -188,4 +197,9 @@ def update_and_display_stock_price_chart(*args, **kwargs):
 
 
 if __name__ == '__main__':
+    latest_prices = deque([], maxlen=N_LATEST_PRICES_MAKING_CHART_HISTORY)
+    latest_timestamps = deque([], maxlen=N_LATEST_PRICES_MAKING_CHART_HISTORY)
+
+    Thread(target=continuous_polling_over_any_latest_events).start()
+
     app.run(host='0.0.0.0', port=CONSUMER_APPLICATION_PORT, debug=False)

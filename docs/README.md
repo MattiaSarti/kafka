@@ -9,6 +9,8 @@
 kafka-topics --bootstrap-server broker:${BROKER_PORT} --topic ${TOPIC_ID} --create
 echo "Topic '${TOPIC_ID}' created:"
 kafka-topics --bootstrap-server broker:${BROKER_PORT} --topic ${TOPIC_ID} --describe
+
+kafka-console-consumer --bootstrap-server localhost:9092 --topic stock-prices --from-beginning
 ```
 
 Simplifications:
