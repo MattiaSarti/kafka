@@ -27,6 +27,7 @@ INFORMATIVE_MESSAGE_METHODS = [
     'topic',
     'value'
 ]
+INTERVAL_FOR_PRICE_CHANGE_PRODUCTION_IN_S = 6
 
 
 def event_publication_acknowledgment(
@@ -67,7 +68,7 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
     current_price = 1
 
     while True:
-        sleep(10)
+        sleep(INTERVAL_FOR_PRICE_CHANGE_PRODUCTION_IN_S)
 
         events_producer.produce(
             on_delivery=event_publication_acknowledgment,
