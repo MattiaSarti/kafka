@@ -1,10 +1,5 @@
 """
 Live stock price chart application, consuming latest price change events.
-
-https://developer.confluent.io/quickstart/kafka-docker/
-https://docs.confluent.io/kafka-clients/python/current/overview.html#ak-consumer
-https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#pythonclient-producer
-https://www.confluent.io/blog/exactly-once-semantics-are-possible-heres-how-apache-kafka-does-it/
 """
 
 
