@@ -14,7 +14,7 @@ TODO
 ## How to Build and Run the Project:
 After installing Docker and Docker Compose, execute, in the root project directory:
 ```bash
-docker compose up --build --detach
+docker compose up --detach
 ```
 (Docker Version: 20.10.18 | Docker Compose Version: v2.12.2)
 
