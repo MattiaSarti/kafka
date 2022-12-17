@@ -58,11 +58,7 @@ def periodically_publish_events_of_random_stock_price_changes() -> None:
     broker.
     """
     events_producer = Producer(
-        {
-            'bootstrap.servers': f"{BROKER_HOST}:{BROKER_PORT}",
-            # 'enable.idempotence': True,  # TODO
-            # 'transactional.id': 0  # TODO
-        }
+        {'bootstrap.servers': f"{BROKER_HOST}:{BROKER_PORT}"}
     )
 
     current_price = 1

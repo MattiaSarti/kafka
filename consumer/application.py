@@ -86,8 +86,6 @@ def continuous_polling_over_any_latest_events():
     Continuously updating the price chart data with any latest events via
     polling.
     """
-    global latest_prices, latest_timesteps
-
     events_consumer = Consumer(
         {
             'bootstrap.servers': f"{BROKER_HOST}:{BROKER_PORT}",
@@ -111,8 +109,7 @@ def continuous_polling_over_any_latest_events():
                 # if the end of the associated partition is reached:
                 if error.code() == KafkaError._PARTITION_EOF:
                     continue
-                else:
-                    raise KafkaException(error)
+                raise KafkaException(error)
 
             latest_prices.append(float(message.value()))
             latest_timesteps.append(float(message.offset()))
@@ -144,7 +141,7 @@ app.layout = Div(
                 'background-color': 'white',
                 'font-size': '25px',
                 'margin-top': '20px',
-                'padding':'15px 30px 15px 30px',
+                'padding': '15px 30px 15px 30px',
                 **TEXT_STYLE
             }
         ),
@@ -176,8 +173,6 @@ def update_and_display_stock_price_chart(*args, **kwargs):
     """
     Update the stock price chart figure with the latest events' data, if any.
     """
-    global latest_prices, latest_timesteps
-
     # recreating the price chart with up-to-date data:
     figure = line(x=latest_timesteps, y=latest_prices)
 
