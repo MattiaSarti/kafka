@@ -66,9 +66,9 @@ def acknowledge_commit(
     else:
         info(
             msg=(
-                "Partition offset(s) committed ✓"
-                "\n\tDetails:\n\t\t"
-                '\n\t\t'.join(
+                "Partition offset(s) committed ✓" +
+                "\n\tDetails:\n\t" +
+                '\n\t'.join(
                     [
                         (
                             f"- offset {str(topic_partition.offset)}"
