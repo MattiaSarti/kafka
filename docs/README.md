@@ -10,11 +10,6 @@
 ![...loading...](./media/project-in-a-picture.png)
 
 
-## A Video-Example:
-
-![](./media/video-example.gif)
-
-
 ## How to Build and Run the Project:
 
 After installing Docker and Docker Compose, execute, in the root project directory:
@@ -22,6 +17,11 @@ After installing Docker and Docker Compose, execute, in the root project directo
 docker compose up --detach
 ```
 (Docker Version: 20.10.18 | Docker Compose Version: v2.12.2)
+
+
+## A Video-Example:
+
+![...loading...](./media/video-example.gif)
 
 You can access the consumer application interface at http://localhost:8000.
 
@@ -31,12 +31,8 @@ You can inspect producer and consumer logs by respectively runing:
 docker compose logs producer
 ```
 
-```bash
-docker compose logs consumer
-```
-
 <details>
-<summary>Expand Samples of the Respective Commands' Outputs</summary>
+<summary>A Samples of the Producer Container's Logs</summary>
 
 ```
 kafka-producer-1  | INFO:root:Event published ✓
@@ -82,6 +78,16 @@ kafka-producer-1  |     Event details: headers: None | key: b'mattia-stock-price
 kafka-producer-1  | INFO:root:Event published ✓
 kafka-producer-1  |     Event details: headers: None | key: b'mattia-stock-price' | latency: 0.005553 | offset: 20 | partition: 0 | timestamp: (1, 1672937106530) | topic: stock-prices | value: b'8.9295355151101'
 ```
+
+</details>
+<br>
+
+```bash
+docker compose logs consumer
+```
+
+<details>
+<summary>A Samples of the Consumer Container's Logs</summary>
 
 ```
 kafka-consumer-1  | Dash is running on http://0.0.0.0:8000/
