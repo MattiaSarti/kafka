@@ -80,7 +80,6 @@ kafka-producer-1  |     Event details: headers: None | key: b'mattia-stock-price
 ```
 
 </details>
-<br>
 
 ```bash
 docker compose logs consumer
@@ -120,7 +119,6 @@ kafka-consumer-1  |     - offset 20 in partition 0 of topic 20
 ```
 
 </details>
-<br>
 
 
 ## Simplifications:
