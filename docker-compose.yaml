@@ -8,7 +8,7 @@ services:
   coordinator:
     container_name: coordinator
     environment:
-      ZOOKEEPER_CLIENT_PORT: "${ZOOKEEPER_PORT}"
+      ZOOKEEPER_CLIENT_PORT: "${COORDINATOR_PORT}"
       ZOOKEEPER_TICK_TIME: 2000
     image: confluentinc/cp-zookeeper:7.3.0
 
@@ -24,7 +24,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_ZOOKEEPER_CONNECT: "coordinator:${ZOOKEEPER_PORT}"
+      KAFKA_ZOOKEEPER_CONNECT: "coordinator:${COORDINATOR_PORT}"
     image: confluentinc/cp-kafka:7.3.0
 
   init-broker:
