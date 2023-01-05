@@ -12,7 +12,7 @@
 
 ## A Video-Example:
 
-TODO
+![](./media/video-example.gif)
 
 
 ## How to Build and Run the Project:
