@@ -1,8 +1,8 @@
 <h1 align="center">Kafka for an Event-driven Microservice Architecture</h1>
 
-<h4 align="center">
+<p align="center">
     Kafka for an Event-driven Microservice-based Project to Produce (Synthetic) Stock Price Changes as Events and to Consume Such Messages in a Web Application for Rendering a Real-Time Stock Price History Chart
-</h4>
+</p>
 
 
 ## The Project in a Picture:
