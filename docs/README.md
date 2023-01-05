@@ -8,8 +8,10 @@
 ## The Project in a Picture:
 ![...loading...](./media/project-in-a-picture.png)
 
+
 ## A Video-Example:
 TODO
+
 
 ## How to Build and Run the Project:
 After installing Docker and Docker Compose, execute, in the root project directory:
@@ -113,5 +115,7 @@ kafka-consumer-1  |     - offset 20 in partition 0 of topic 20
 
 
 ## Simplifications:
-- no fault tolerance (single broker, producer and consumer instances, simplified producer and consumer)
-- consumer cannot scale (no coordination in distributed application), Kafka Streams API not employed
+- no fault tolerance (single broker, producer and consumer replicas, simplified producer and consumer)
+- consumer cannot scale (no event fetching coordination in distributed application, as Kafka Streams API not employed, and in-memory data storage)
+- at-most-once producer-to-broker delivery
+- at-least-once broker-to-consumer delivery
