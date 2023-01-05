@@ -32,7 +32,7 @@ docker compose logs producer
 ```
 
 <details>
-<summary>A Samples of the Producer Container's Logs</summary>
+<summary>A Sample of the Producer Container's Logs</summary>
 
 ```
 kafka-producer-1  | INFO:root:Event published ✓
@@ -86,7 +86,7 @@ docker compose logs consumer
 ```
 
 <details>
-<summary>A Samples of the Consumer Container's Logs</summary>
+<summary>A Sample of the Consumer Container's Logs</summary>
 
 ```
 kafka-consumer-1  | Dash is running on http://0.0.0.0:8000/
