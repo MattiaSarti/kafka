@@ -85,6 +85,9 @@ def continuous_polling_over_any_latest_events():
     """
     Continuously updating the price chart data with any latest events via
     polling.
+
+    NOTE: at-least-once delivery preferred to at-most-once by committing
+    offset update(s) after, and not before, event processing.
     """
     events_consumer = Consumer(
         {
